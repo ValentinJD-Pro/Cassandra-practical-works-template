@@ -1,3 +1,16 @@
+1 : docker network create  cassandra-network
+
+2 : docker run --name cassandra-server-1 --network cassandra-network -d -p 9042:9042 -v C:\docker-volumes\cassandra-server-1:/var/lib/cassandra cassandra:latest
+
+3 : docker run -it --network cassandra-network --rm cassandra cqlsh cassandra-server-1 = Celle ci permet de rentrer dans la commande cql du conteneur
+
+
+
+
+
+
+
+
 create keyspace vj_demo1
     with replication = {
     'class' : 'SimpleStrategy',
