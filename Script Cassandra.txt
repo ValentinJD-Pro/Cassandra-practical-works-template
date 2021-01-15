@@ -1,0 +1,81 @@
+create keyspace vj_demo1
+    with replication = {
+    'class' : 'SimpleStrategy',
+    'replication_factor' : 1
+   };
+
+
+create keyspace vj_demo2
+    with replication = {
+    'class' : 'SimpleStrategy',
+    'replication_factor' : 1
+   };
+
+
+select * from system_schema.keyspaces;
+
+create table if not exists vj_demo1.vj_cfdemo1(
+    id uuid, 
+    name text, 
+    value int, 
+    maps map<int, text>, 
+    primary key ((id), name, value)
+);
+
+
+
+
+
+
+create type vj_adresse(
+    postal_code int,
+    city text,
+    adresse text,
+);
+
+create table if not exists vj_demo2.vj_cfdemo2 (
+    id timeuuid, 
+    name text, 
+    created timestamp, 
+    tweet set<text>, 
+    geolocation tuple<float, float, int>, 
+    primary key ((id), name, created)
+);
+
+create table if not exists vj_demo2.vj_cfdemoCompositeKey (
+    id uuid, 
+    created date,
+    adresses map<frozen<vj_adresse>,text>,
+    name text, 
+    primary key((id,created), name)
+);
+
+
+
+
+
+
+
+//TABLE et VUE DE SOLENE
+
+create table if not exists vj_cfdemo3(
+    id uuid, 
+    name varchar, 
+    value int, 
+    maps map<int, text>, 
+    primary key ((id), name)
+);
+
+
+create materialized view if not exists vj_demo1.vj_materialized_view as
+select id, name, value, maps
+from vj_demo2.vj_cfdemo3
+where value is not null
+and id is not null
+primary key (id, name)
+with clustering order by (name desc)
+and caching = {
+'keys' : 'ALL',
+'rows_per_partition' : '100'
+}
+and comment = 'Based on vj_cfdemo1';
